@@ -3,6 +3,8 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 import authRoutes from "./routes/auth.route.js"
+import userRoutes from "./routes/user.route.js"
+import productRoutes from "./routes/product.route.js"
 
 const app = express();
 app.use(cors());
@@ -17,6 +19,8 @@ app.use(morgan('dev'))
 
 // // ===== Routes =====
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/product', productRoutes);
 
 
 // // ===== 404 =====
