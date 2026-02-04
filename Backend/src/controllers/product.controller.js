@@ -1,3 +1,6 @@
+import pool from '../config/database_mysql.js';
+
+
 export const getProduct = async (req, res)=>{
     res.json({
         message: "getProduct success"

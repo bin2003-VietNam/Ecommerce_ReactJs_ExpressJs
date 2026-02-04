@@ -1,3 +1,6 @@
+import pool from '../config/database_mysql.js';
+
+
 export const createPayment = async (req, res) => {
   const payment_method = req.query.payment_method;
   res.json({

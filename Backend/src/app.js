@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import dotenv from 'dotenv';
 
 import authRoutes from "./routes/auth.route.js"
 import userRoutes from "./routes/user.route.js"
@@ -10,6 +11,8 @@ import orderRoutes from "./routes/order.route.js"
 import paymentRoutes from "./routes/payment.route.js"
 import adminRoutes from "./routes/admin.route.js"
 
+
+dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());

@@ -1,3 +1,6 @@
+import pool from '../config/database_mysql.js';
+
+
 export const getCart = async (req, res) => {
   res.json({
     message: "getCart successfully"

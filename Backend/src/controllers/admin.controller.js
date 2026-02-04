@@ -1,3 +1,6 @@
+import pool from '../config/database_mysql.js';
+
+
 export const getAllOrder = async (req, res) => {
   res.json({
     message: "getAllOrder successfully",
