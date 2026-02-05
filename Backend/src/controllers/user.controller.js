@@ -1,7 +1,6 @@
 import pool from '../config/database_mysql.js';
 
 export const getUserProfile = async (req, res) => {
-  // token jwt decode -> req.userId
   const userId = req.user.userId;  
   try {
     const [rows] = await pool.query(`
@@ -23,9 +22,27 @@ export const getUserProfile = async (req, res) => {
 };
 
 export const updateUserProfile = async (req, res) => {
-  res.json({
-    message: "updateUserProfile success"
-  });
+  const userId = req.user.userId;  
+  const { email, full_name } = req.body;
+  try {
+    const [rows] = await pool.query(`
+      UPDATE users
+      SET email=?, full_name=?
+      WHERE id=?
+      `,[email,full_name,userId])
+    if(rows.length===0){
+      return res.status(401).json({
+        message: "user not exist"
+      })
+    }
+    res.status(200).json({
+      message: "update successfully"
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: "error: " + error
+    })
+  } 
 };
 
 export const updateUserPassword = async (req, res) => {
