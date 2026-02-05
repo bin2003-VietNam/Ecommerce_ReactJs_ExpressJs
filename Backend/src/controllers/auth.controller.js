@@ -92,13 +92,6 @@ export const login = async (req, res) => {
 
 };
 
-export const checkAuth = async (req, res) => {
-  // sau này: verify JWT ở đây
-  res.json({
-    message: "CheckAuth success"
-  });
-};
-
 export const logout = async (req, res) => {
   res
     .clearCookie('access_token')

@@ -1,9 +1,11 @@
+// import dependencies
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 
+// Import routes
 import authRoutes from "./routes/auth.route.js"
 import userRoutes from "./routes/user.route.js"
 import productRoutes from "./routes/product.route.js"
@@ -11,6 +13,8 @@ import cartRoutes from "./routes/cart.route.js"
 import orderRoutes from "./routes/order.route.js"
 import paymentRoutes from "./routes/payment.route.js"
 import adminRoutes from "./routes/admin.route.js"
+
+// Import middlewares
 import { verifyToken } from './middlewares/auth.middleware.js';
 
 dotenv.config();
