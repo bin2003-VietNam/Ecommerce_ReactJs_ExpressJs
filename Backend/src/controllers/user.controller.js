@@ -1,4 +1,5 @@
 import pool from '../config/database_mysql.js';
+import bcrypt from 'bcrypt';
 
 export const getUserProfile = async (req, res) => {
   const userId = req.user.userId;  
@@ -30,9 +31,9 @@ export const updateUserProfile = async (req, res) => {
       SET email=?, full_name=?
       WHERE id=?
       `,[email,full_name,userId])
-    if(rows.length===0){
+    if(rows.affectedRows ===0){
       return res.status(401).json({
-        message: "user not exist"
+        message: "user not found"
       })
     }
     res.status(200).json({
@@ -46,9 +47,28 @@ export const updateUserProfile = async (req, res) => {
 };
 
 export const updateUserPassword = async (req, res) => {
-  res.json({
-    message: "updateUserPassword success"
-  });
+  const userId = req.user.userId;  
+  const { password } = req.body;
+  const password_hashed = await bcrypt.hash(password, 10)
+  try {
+    const [rows] = await pool.query(`
+      UPDATE users
+      SET password_hash=?
+      WHERE id=?
+      `,[password_hashed,userId])
+    if(rows.affectedRows ===0){
+      return res.status(401).json({
+        message: "user not found"
+      })
+    }
+    res.status(200).json({
+      message: "update successfully"
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: "error: " + error
+    })
+  } 
 };
 
 export const getUserOrder = async (req, res) => {
