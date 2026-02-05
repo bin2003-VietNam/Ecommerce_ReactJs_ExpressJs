@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 import authRoutes from "./routes/auth.route.js"
 import userRoutes from "./routes/user.route.js"
@@ -10,23 +11,24 @@ import cartRoutes from "./routes/cart.route.js"
 import orderRoutes from "./routes/order.route.js"
 import paymentRoutes from "./routes/payment.route.js"
 import adminRoutes from "./routes/admin.route.js"
-
+import { verifyToken } from './middlewares/auth.middleware.js';
 
 dotenv.config();
 const app = express();
-app.use(cors());
+app.use(cors());  
 app.use(express.json());
 
 // ===== Middleware =====
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'))
 
 
 // // ===== Routes =====
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
+app.use('/api/user', verifyToken,userRoutes);
 app.use('/api/product', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/order', orderRoutes);

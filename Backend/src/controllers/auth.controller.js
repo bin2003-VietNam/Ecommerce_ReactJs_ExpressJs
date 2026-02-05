@@ -1,11 +1,10 @@
 import pool from '../config/database_mysql.js';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export const register = async (req, res) => {
-  try {
-    const { email, password, full_name } = req.body;
-    console.log( req.body);
-    
+  const { email, password, full_name } = req.body;
+  try {    
     // 1. validate
     if( !email || !password || !full_name ) {
       return res.status(400).json({
@@ -43,9 +42,54 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  res.json({
-    message: "Login success"
-  });
+  const { email, password } = req.body;  
+  // 1. check email 
+  try{
+    const [rows] = await pool.query(`
+      SELECT id, password_hash
+      FROM users
+      WHERE email=?
+      `,[email])
+    if(rows.length===0)
+      return res.status(401).json({
+        message: "Invalid email"
+      })
+
+  // 2. compare password
+    const isPasswordValid = await bcrypt.compare(password, rows[0].password_hash)
+    if(!isPasswordValid){
+      return res.status(401).json({ 
+        message: "Invalid password"
+      })
+    }else{
+  // 3. generate JWT token
+      const payload = {
+        userId: rows[0].id,
+      }
+      const token = jwt.sign(payload, process.env.JWT_SECRET,{
+        expiresIn: '1h'
+      })
+  // 4. respond with token
+      res
+        .cookie('access_token', token,{
+          httpOnly: true,
+          secure: false,
+          sameSite: 'lax',
+          maxAge: 3600000 ,
+          domain: 'localhost'
+        })      
+        .json({
+          message: "Login success",
+          token: token
+        })
+    }
+  }catch(error){
+    console.error('Login error:', error);
+    return res.status(500).json({
+      message: 'Server error'
+    });
+  }
+
 };
 
 export const checkAuth = async (req, res) => {
@@ -56,7 +100,7 @@ export const checkAuth = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  res.json({
-    message: "Logout success"
-  });
+  res
+    .clearCookie('access_token')
+    .json({ message: 'Logout is success' });
 };
