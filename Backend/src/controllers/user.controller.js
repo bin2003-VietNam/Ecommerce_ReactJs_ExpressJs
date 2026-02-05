@@ -71,8 +71,26 @@ export const updateUserPassword = async (req, res) => {
   } 
 };
 
+// chưa test
 export const getUserOrder = async (req, res) => {
-  res.json({
-    message: "getOrder success"
-  });
+  const userId = req.user.userId;  
+  try {
+    const [rows] = await pool.query(`
+      SELECT * 
+      FROM order
+      WHERE user_id=?
+      `,[userId])
+    if(rows.length ===0){
+      return res.status(401).json({
+        message: "order empty"
+      })
+    }
+    res.status(200).json({
+      message: "Successed retrieve order history"
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: "error: " + error
+    })
+  } 
 };
