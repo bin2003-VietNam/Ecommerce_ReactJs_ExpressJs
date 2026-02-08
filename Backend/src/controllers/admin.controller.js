@@ -23,10 +23,29 @@ export const createProduct = async (req, res)=>{
     } = req.body
     if(!req.file){
       res.status(401).json({
-      message: "erro"
+      message: "There is no file"
      })
     }
+    // insert product
     const imageUrl = await uploadImageToSuperbase(req.file)
+    const [productResult] = await pool.execute(`
+      INSERT INTO products
+      (category_id, name, slug, description, price, stock, thumbnail, is_featured)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `, [parseInt(category_id), name, slug, description, price, stock, thumbnail, parseInt(is_featured)])
+    // insert product_image
+    const productId = productResult.insertId
+    const [productImageResult] = await pool.execute(`
+      INSERT INTO product_images
+      (product_id, image_url)
+      VALUES
+      (?, ?)
+      `,[parseInt(productId), imageUrl])
+    if(productImageResult.rowsAffected ===0){
+      return res.status(401).json({
+        message: "failed to add product image"
+      })
+    }
     res.status(200).json({
       message: "createProduct success",
       imageUrl:imageUrl
