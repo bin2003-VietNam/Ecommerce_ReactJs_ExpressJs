@@ -1,15 +1,28 @@
 import express from 'express';
+import { upload } from '../middlewares/upload.js';
 import {
     getAllOrder,
     changeOrderStatus,
-    getRevenueByDay,
-    getRevenueByMonth
+    createProduct, createCategory,
+    updateProduct, updateCategory,
+    deleteProduct, deleteCategory,
+    getRevenueByDay, getRevenueByMonth
 } from '../controllers/admin.controller.js';
 
 const router = express.Router();
 
+// order
 router.get('/order', getAllOrder);
 router.put('/order/status', changeOrderStatus);
+// product
+router.post('/product', upload.single("image"),createProduct);
+router.put('/product/:id', updateProduct);
+router.delete('/product/:id', deleteProduct);
+// category
+router.post('/category', createCategory);
+router.put('/category/:id', updateCategory);
+router.delete('/category', deleteCategory);
+// statistic
 router.get('/statistic/revenue', getRevenueByDay);
 router.get('/statistic/revenue', getRevenueByMonth);
 

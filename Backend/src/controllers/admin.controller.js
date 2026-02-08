@@ -1,11 +1,122 @@
 import pool from '../config/database_mysql.js';
-
+import { uploadImageToSuperbase } from '../utils/uploadImageToSuperbase.js';
 
 export const getAllOrder = async (req, res) => {
   res.json({
     message: "getAllOrder successfully",
   });
 };
+
+export const createProduct = async (req, res)=>{
+   try {
+    console.log(req.body);
+    
+    const {  
+      category_id,
+      name,
+      slug,
+      description,
+      price, 
+      stock,
+      thumbnail,
+      is_featured
+    } = req.body
+    if(!req.file){
+      res.status(401).json({
+      message: "erro"
+     })
+    }
+    const imageUrl = await uploadImageToSuperbase(req.file)
+    res.status(200).json({
+      message: "createProduct success",
+      imageUrl:imageUrl
+    })
+   } catch (error) {
+    res.status(500).json({
+      message: "error: " + error
+    })
+   }
+}
+
+export const updateProduct = async (req, res)=>{
+  res.json({
+      message: "updateProduct success"
+  })
+}
+
+export const deleteProduct = async (req, res)=>{
+  const productName = req.body.name;
+  try {
+    const [rows] = await pool.query(`
+      DELETE FROM products
+        WHERE name=?
+      `, [productName])
+    if(rows.affectedRows ===0){
+      return res.status(401).json({
+        message: "failed to delete product"
+      })
+    }
+    res.status(200).json({
+      message: "success delete product"
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: "error: " + error
+    })
+  }
+}
+
+export const createCategory = async (req, res)=>{
+  const categoryName = req.body.name;
+  try {
+    const [rows] = await pool.query(`
+      INSERT INTO categories
+        (name)
+      VALUE
+        (?)
+      `, [categoryName])
+    if(rows.affectedRows ===0){
+      return res.status(401).json({
+        message: "failed to add category"
+      })
+    }
+    res.status(200).json({
+      message: "success add category"
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: "error: " + error
+    })
+  }
+}
+
+export const updateCategory = async (req, res)=>{
+    res.json({
+        message: "updateCategory success"
+    })
+}
+
+export const deleteCategory = async (req, res)=>{
+  const categoryName = req.body.name;
+  try {
+    const [rows] = await pool.query(`
+      DELETE FROM categories
+        WHERE name=?
+      `, [categoryName])
+    if(rows.affectedRows ===0){
+      return res.status(401).json({
+        message: "failed to delete category"
+      })
+    }
+    res.status(200).json({
+      message: "success delete category"
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: "error: " + error
+    })
+  }
+}
 
 export const changeOrderStatus = async (req, res) => {
   const orderId = req.query.OrderId;
@@ -30,3 +141,5 @@ export const getRevenueByMonth = async (req, res) => {
     type: type,
   });
 };
+
+

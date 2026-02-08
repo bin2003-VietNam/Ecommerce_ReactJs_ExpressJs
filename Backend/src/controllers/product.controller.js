@@ -1,6 +1,5 @@
 import pool from '../config/database_mysql.js';
 
-
 export const getProduct = async (req, res)=>{
     res.json({
         message: "getProduct success"
@@ -24,24 +23,3 @@ export const getProductByCategory = async (req, res)=>{
     })
 }
 
-export const createProduct = async (req, res)=>{
-    res.json({
-        message: "createProduct success"
-    })
-}
-
-export const updateProduct = async (req, res)=>{
-    const productId = req.params.id;
-    res.json({
-        message: "updateProduct success",
-        productId: productId
-    })
-}
-
-export const deleteProduct = async (req, res)=>{
-    const productId = req.params.id;
-    res.json({
-        message: "deleteProduct success",
-        productId: productId
-    })
-}
