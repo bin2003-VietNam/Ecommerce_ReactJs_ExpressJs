@@ -1,5 +1,8 @@
 import pool from '../config/database_mysql.js';
-import { uploadImageToSuperbase } from '../utils/uploadImageToSuperbase.js';
+import { 
+  uploadImageToSuperbase,
+  deleteImageFromSuperbase
+ } from '../utils/supabase.util.js';
 
 export const getAllOrder = async (req, res) => {
   res.json({
@@ -64,13 +67,28 @@ export const updateProduct = async (req, res)=>{
 }
 
 export const deleteProduct = async (req, res)=>{
-  const productName = req.body.name;
+  const {productId} = req.body;
   try {
-    const [rows] = await pool.query(`
-      DELETE FROM products
-        WHERE name=?
-      `, [productName])
-    if(rows.affectedRows ===0){
+    // delete product_image in supabase
+    const [imageRows] = await pool.execute(`
+      SELECT image_url 
+      FROM product_images
+      WHERE product_id=? 
+      `, [productId])
+    imageRows.map(async imageRow => {
+      const relativePath = imageRow.image_url.split('/').pop();
+      const result = await deleteImageFromSuperbase(relativePath)
+      if(result == 0){
+        console.log('delete successsfully');
+      }else{
+        console.log('fail to delete from supabase');
+      }
+    })
+    // delete product in mysql
+    const [result] = await pool.execute(`
+      DELETE FROM products WHERE id=?;
+      `, [productId])
+    if(result.affectedRows ===0){
       return res.status(401).json({
         message: "failed to delete product"
       })
