@@ -19,6 +19,6 @@ export const deleteImageFromSuperbase = async (filePath)=>{
   .storage
   .from('product_image')
   .remove(filePath)
-  if(error) throw error
+  if(error) return 1
   return 0
 }

@@ -74,15 +74,12 @@ export const deleteProduct = async (req, res)=>{
       FROM product_images
       WHERE product_id=? 
       `, [productId])
-    imageRows.map(async imageRow => {
-      const relativePath = imageRow.image_url.split('/').pop();
+    
+    for(const imageUrl of imageRows){
+      const relativePath = imageUrl.image_url.split('/').pop();
       const result = await deleteImageFromSuperbase(relativePath)
-      if(result == 0){
-        console.log('delete successsfully');
-      }else{
-        console.log('fail to delete from supabase');
-      }
-    })
+      if(result==1) console.log('fail to delete image');
+    }
     // delete product in mysql
     const [result] = await pool.execute(`
       DELETE FROM products WHERE id=?;
