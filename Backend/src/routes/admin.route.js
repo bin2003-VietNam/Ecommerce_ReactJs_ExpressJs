@@ -15,7 +15,10 @@ const router = express.Router();
 router.get('/order', getAllOrder);
 router.put('/order/status', changeOrderStatus);
 // product
-router.post('/product', upload.single("image"),createProduct);
+router.post('/product', upload.fields([
+    { name: 'main_image', maxCount: 1 },
+    { name: 'sub_images', maxCount: 4 }
+]),createProduct);
 router.put('/product/:id', updateProduct);
 router.delete('/product/:id', deleteProduct);
 // category

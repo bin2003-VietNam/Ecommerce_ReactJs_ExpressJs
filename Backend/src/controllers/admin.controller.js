@@ -12,8 +12,6 @@ export const getAllOrder = async (req, res) => {
 
 export const createProduct = async (req, res)=>{
    try {
-    console.log(req.body);
-    
     const {  
       category_id,
       name,
@@ -24,13 +22,16 @@ export const createProduct = async (req, res)=>{
       thumbnail,
       is_featured
     } = req.body
-    if(!req.file){
-      res.status(401).json({
-      message: "There is no file"
-     })
+
+    const mainImage = req.files.main_image || []
+    const subImages = req.files.sub_images || []
+    let listImageFiles = [...mainImage, ...subImages]
+    let imageUrlList = [];
+    for (const file of listImageFiles) {
+      const url = await uploadImageToSuperbase(file);
+      imageUrlList.push(url);
     }
-    // insert product
-    const imageUrl = await uploadImageToSuperbase(req.file)
+
     const [productResult] = await pool.execute(`
       INSERT INTO products
       (category_id, name, slug, description, price, stock, thumbnail, is_featured)
@@ -38,20 +39,18 @@ export const createProduct = async (req, res)=>{
       `, [parseInt(category_id), name, slug, description, price, stock, thumbnail, parseInt(is_featured)])
     // insert product_image
     const productId = productResult.insertId
-    const [productImageResult] = await pool.execute(`
+    imageUrlList.forEach(async imageUrl =>{
+      await pool.execute(`
       INSERT INTO product_images
       (product_id, image_url)
       VALUES
       (?, ?)
       `,[parseInt(productId), imageUrl])
-    if(productImageResult.rowsAffected ===0){
-      return res.status(401).json({
-        message: "failed to add product image"
-      })
-    }
+    }) 
+
     res.status(200).json({
       message: "createProduct success",
-      imageUrl:imageUrl
+      imageUrlList: imageUrlList
     })
    } catch (error) {
     res.status(500).json({

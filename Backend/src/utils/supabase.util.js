@@ -1,6 +1,7 @@
 import { supabase } from "../config/database_supabase.js";
+import {v4 as uuidv4} from 'uuid';
 export const uploadImageToSuperbase = async (file)=>{
-    const filePath = `${file.originalname}`
+    const filePath = `${uuidv4()}`
     const {error} = await supabase
       .storage
       .from('product_image')
