@@ -28,8 +28,9 @@ export const getProductById = async (req, res)=>{
             SELECT *
             FROM products
             WHERE id=?
+            ORDER BY created_at DESC
+            LIMIT 10
             `,[productId])
-        console.log(rows);
         res.status(200).json({
             message: "success to get product by id",
             product: rows[0]
@@ -42,10 +43,25 @@ export const getProductById = async (req, res)=>{
 }
 
 export const getProductByCategory = async (req, res)=>{
-    const category = req.query.category;
-    res.json({
-        message: "getProductByCategory success",
-        category: category
+    const productCategoryId = req.query.category
+
+    try {
+    const [productList] = await pool.execute(`
+        SELECT *
+        FROM products
+        WHERE category_id=?
+        ORDER BY created_at DESC
+        LIMIT 10
+        `,[productCategoryId])
+    res.status(200).json({
+        message: "success to get product by category id",
+        productList: productList
     })
+} catch (error) {
+    res.status(400).json({
+    message: 'fail to get product (by id)'
+    })
+}
+
 }
 
