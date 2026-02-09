@@ -1,9 +1,23 @@
 import pool from '../config/database_mysql.js';
 
 export const getProduct = async (req, res)=>{
-    res.json({
-        message: "getProduct success"
+    try {
+        const [productList] = await pool.execute(`
+            SELECT *
+            FROM products
+            ORDER BY created_at DESC
+            LIMIT 10
+            `)
+    res.status(200).json({
+        message: "success to get product",
+        productList: productList
     })
+        
+    } catch (error) {
+        res.status(400).json({
+            message: 'fail to get product'
+        })
+    }
 }
 
 export const getProductById = async (req, res)=>{
