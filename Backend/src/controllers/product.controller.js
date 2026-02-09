@@ -23,10 +23,22 @@ export const getProduct = async (req, res)=>{
 export const getProductById = async (req, res)=>{
     const productId = req.query.id;
 
-    res.json({
-        message: "getProductById success",
-        productId: productId
-    })
+    try {
+        const [rows] = await pool.execute(`
+            SELECT *
+            FROM products
+            WHERE id=?
+            `,[productId])
+        console.log(rows);
+        res.status(200).json({
+            message: "success to get product by id",
+            product: rows[0]
+        })
+    } catch (error) {
+        res.status(400).json({
+        message: 'fail to get product (by id)'
+      })
+    }
 }
 
 export const getProductByCategory = async (req, res)=>{
